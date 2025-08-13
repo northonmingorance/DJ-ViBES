@@ -164,6 +164,7 @@
             margin-bottom: 0.5rem;
             font-family: 'VT323', monospace;
             letter-spacing: 1px;
+            text-align: center; /* Center the labels */
         }
         
         .label-desc {
@@ -211,26 +212,40 @@
         .d-pad-container {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center; /* Center the items */
+            gap: 0.75rem; /* Add space between items */
+            margin-top: 0.5rem;
         }
 
-        .d-pad-display {
+        /* NEW: Styles for the editable number input */
+        .d-pad-input {
             background: var(--shell-bg);
             box-shadow: inset 2px 2px 4px var(--shell-shadow), inset -2px -2px 4px var(--shell-highlight);
             border-radius: 0.5rem;
             padding: 0.5rem 1rem;
             text-align: center;
-            width: 60px;
+            width: 70px; /* A bit wider for typing */
             font-family: 'VT323', monospace;
             font-size: 1.5rem;
+            color: var(--text-dark);
+            border: 1px solid var(--shell-shadow);
         }
-        
-        input[type=number] { display: none; } /* Hide original input */
+        .d-pad-input:focus {
+            outline: none;
+            box-shadow: inset 2px 2px 4px var(--shell-shadow), 
+                        inset -2px -2px 4px var(--shell-highlight),
+                        0 0 10px var(--screen-glow);
+            border-color: var(--y2k-blue);
+        }
 
-        .d-pad {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
+        /* NEW: Hide number input spinners */
+        .d-pad-input::-webkit-outer-spin-button,
+        .d-pad-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .d-pad-input[type=number] {
+            -moz-appearance: textfield; /* Firefox */
         }
 
         .d-pad-button {
@@ -245,6 +260,9 @@
             transition: all 0.1s ease-in;
             border-radius: 0.5rem;
             box-shadow: 3px 3px 6px var(--shell-shadow), -3px -3px 6px var(--shell-highlight);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .d-pad-button:active {
             box-shadow: inset 3px 3px 6px var(--shell-shadow), inset -3px -3px 6px var(--shell-highlight);
@@ -452,8 +470,8 @@
 
                 <div class="form-section">
                     <label for="song-input">INPUT SEED DATA:</label>
-                    <p class="label-desc">Enter songs, artists, or vibes. Be as specific or abstract as you like.</p>
-                    <textarea id="song-input" rows="8" placeholder="> Brazillian 60s Fuzz Guitar&#10;> The Third Ear Band&#10;> https://open.spotify.com/track/0oP2XkRvW12u8gCxpBfVVU?si=...&#10;> A vibe like the closing credits of a film..."></textarea>
+                    <p class="label-desc">Enter songs, artists, or vibes. One per line. Be as specific or abstract as you like.</p>
+                    <textarea id="song-input" rows="8" placeholder="> Brazillian 60s Fuzz Guitar&#10;> The Third Ear Band&#10;> https://open.spotify.com/track/0oP2XkRvW12u8gCxpBfVVU?si=...&#10; A vibe like the closing credits of a film..."></textarea>
                 </div>
 
                 <div id="results-view">
@@ -468,24 +486,20 @@
              <div class="controls-grid">
                 <div>
                     <label for="playlist-length">TRACKS / MIX</label>
+                    <!-- UPDATED: Control layout -->
                     <div class="d-pad-container">
-                        <div class="d-pad">
-                            <button type="button" class="d-pad-button" data-action="decrement" data-target="playlist-length">−</button>
-                            <button type="button" class="d-pad-button" data-action="increment" data-target="playlist-length">+</button>
-                        </div>
-                        <div id="playlist-length-display" class="d-pad-display">15</div>
-                        <input type="number" id="playlist-length" value="15" min="3" max="150">
+                        <button type="button" class="d-pad-button" data-action="decrement" data-target="playlist-length">−</button>
+                        <input type="number" id="playlist-length" class="d-pad-input" value="15" min="3" max="150">
+                        <button type="button" class="d-pad-button" data-action="increment" data-target="playlist-length">+</button>
                     </div>
                 </div>
                 <div>
                     <label for="num-playlists">NUMBER OF MIXES</label>
+                    <!-- UPDATED: Control layout -->
                      <div class="d-pad-container">
-                        <div class="d-pad">
-                            <button type="button" class="d-pad-button" data-action="decrement" data-target="num-playlists">−</button>
-                            <button type="button" class="d-pad-button" data-action="increment" data-target="num-playlists">+</button>
-                        </div>
-                        <div id="num-playlists-display" class="d-pad-display">3</div>
-                        <input type="number" id="num-playlists" value="3" min="1" max="10">
+                        <button type="button" class="d-pad-button" data-action="decrement" data-target="num-playlists">−</button>
+                        <input type="number" id="num-playlists" class="d-pad-input" value="3" min="1" max="10">
+                        <button type="button" class="d-pad-button" data-action="increment" data-target="num-playlists">+</button>
                     </div>
                 </div>
             </div>
@@ -551,9 +565,9 @@
         const progressBar = document.getElementById('progress-bar');
         const cancelButton = document.getElementById('cancel-button');
         
-        // New display elements for D-pad
-        const playlistLengthDisplay = document.getElementById('playlist-length-display');
-        const numPlaylistsDisplay = document.getElementById('num-playlists-display');
+        // REMOVED: Unused display element constants
+        // const playlistLengthDisplay = document.getElementById('playlist-length-display');
+        // const numPlaylistsDisplay = document.getElementById('num-playlists-display');
 
 
         class CancellationError extends Error {
@@ -583,7 +597,9 @@
                 console.error("Firebase/Remote Config Error:", err);
                 apiKeyStatus.textContent = "ERROR: AI ENGINE OFFLINE";
                 apiKeyStatus.style.color = 'var(--danger-red)'; 
-                alert("Error: Could not load the Gemini API Key from Firebase. Please check your configuration and ensure the 'gemini_api_key' parameter is set in Remote Config.");
+                // Using a custom modal or a less intrusive notification would be better than alert()
+                // For this example, we'll keep it to see the error clearly.
+                console.error("Error: Could not load the Gemini API Key from Firebase. Please check your configuration and ensure the 'gemini_api_key' parameter is set in Remote Config.");
             }
         }
 
@@ -598,7 +614,6 @@
                     await initializeUI();
                 } catch (error) {
                     console.error("Error getting access token:", error);
-                    alert("Error: Could not authenticate with Spotify.");
                 }
             } else if (localStorage.getItem('spotify_access_token')) {
                 await initializeUI();
@@ -689,7 +704,6 @@
                 await initializeFirebaseAndGetApiKey();
             } catch (error) {
                 console.error("Error initializing UI:", error);
-                alert("Could not fetch your Spotify profile. Please try logging in again.");
                 localStorage.clear();
                 loginView.style.display = 'block';
                 mainView.style.display = 'none';
@@ -697,6 +711,7 @@
             }
         }
 
+        // UPDATED: Simplified function to handle button clicks
         function setupDPad(container) {
             container.addEventListener('click', (event) => {
                 const button = event.target.closest('.d-pad-button');
@@ -705,9 +720,8 @@
                 const targetId = button.dataset.target;
                 const action = button.dataset.action;
                 const input = document.getElementById(targetId);
-                const display = document.getElementById(`${targetId}-display`);
                 
-                if (!input || !display) return;
+                if (!input) return;
 
                 const min = parseFloat(input.min);
                 const max = parseFloat(input.max);
@@ -723,11 +737,36 @@
                 }
 
                 input.value = currentValue;
-                display.textContent = currentValue;
+            });
+        }
+        
+        // NEW: Event listener to validate direct user input
+        function setupInputValidation(input) {
+            input.addEventListener('change', (e) => {
+                const inputEl = e.target;
+                const min = parseFloat(inputEl.min);
+                const max = parseFloat(inputEl.max);
+                let value = parseFloat(inputEl.value);
+
+                if (isNaN(value)) {
+                    value = min; // Default to min if input is not a number
+                }
+
+                // Clamp the value between min and max
+                if (value < min) {
+                    value = min;
+                }
+                if (value > max) {
+                    value = max;
+                }
+                inputEl.value = value;
             });
         }
 
-        document.querySelectorAll('.d-pad-container').forEach(setupDPad);
+        // Initialize all controls
+        document.querySelectorAll('.controls-grid > div').forEach(setupDPad);
+        document.querySelectorAll('.d-pad-input').forEach(setupInputValidation);
+
 
         cancelButton.addEventListener('click', () => {
             playlistGenerationState.isCancelled = true;
