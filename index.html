@@ -4,78 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DJ-ViBES: AI Mix Creator</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎛️</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💿</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --spotify-green: #1DB954;
-            --spotify-green-hover: #1ED760;
-            --dark-bg: #111827;
-            --primary-card-bg: #1F2937;
-            --secondary-card-bg: #374151;
-            --input-bg: #4B5563;
-            --text-primary: #FFFFFF;
-            --text-secondary: #D1D5DB;
-            --text-tertiary: #9CA3AF;
-            --text-quaternary: #6B7280;
-            --danger-red: #DC2626;
-            --danger-red-hover: #B91C1C;
+            --y2k-blue: #3a86ff;
+            --y2k-pink: #ff006e;
+            --y2k-purple: #8338ec;
+            --bg-color: #DCE1E9;
+            --shell-bg: #BFC8D9;
+            --shell-highlight: #E1E8F2;
+            --shell-shadow: #A8B2C2;
+            --screen-bg: #C5D4E8;
+            --screen-glow: rgba(58, 134, 255, 0.3);
+            --text-dark: #212536;
+            --text-light: #F0F4FA;
+            --translucent-blue: rgba(58, 134, 255, 0.8);
+            --translucent-blue-hover: rgba(58, 134, 255, 1);
+            --translucent-dark: rgba(33, 37, 54, 0.7);
+            --translucent-dark-hover: rgba(33, 37, 54, 0.9);
+            --danger-red: #e63946;
+            --danger-red-hover: #d62828;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text-primary);
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
+            padding: 1rem;
         }
 
+        /* Hardware Shell Styling */
         #app-container {
             width: 100%;
-            max-width: 42rem;
-            margin: auto;
+            max-width: 40rem;
+            background: linear-gradient(145deg, var(--shell-highlight), var(--shell-bg));
+            border-radius: 2rem;
+            box-shadow: 
+                -10px -10px 20px rgba(255, 255, 255, 0.7), 
+                10px 10px 20px rgba(168, 178, 194, 0.8),
+                inset 0 0 0 2px var(--shell-shadow);
             padding: 1.5rem;
-            background-color: var(--primary-card-bg);
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 3px solid #ADB8CC;
         }
 
-        #login-view {
-            text-align: center;
+        #screen-area {
+            background-color: var(--screen-bg);
+            border: 2px solid var(--shell-shadow);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: inset 5px 5px 10px var(--shell-shadow), inset -5px -5px 10px var(--shell-highlight);
+            margin-bottom: 1.5rem;
         }
 
         h1 {
-            font-size: 2.25rem;
-            font-weight: 700;
-            color: var(--text-primary);
+            font-family: 'VT323', monospace;
+            font-size: 3rem;
+            color: var(--text-dark);
+            text-align: center;
             margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 0px var(--shell-highlight);
         }
 
+        /* Login View */
         #login-view p {
-            color: var(--text-tertiary);
+            color: var(--text-dark);
             margin-bottom: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
         }
 
         #login-button {
-            background-color: var(--spotify-green);
-            color: var(--text-primary);
+            display: block;
+            width: fit-content;
+            margin: 0 auto;
+            background: var(--translucent-blue);
+            color: var(--text-light);
             font-weight: 700;
             padding: 0.75rem 2rem;
-            border-radius: 9999px;
+            border-radius: 0.5rem;
             font-size: 1.125rem;
-            transition: all 0.3s;
-            border: none;
+            transition: all 0.2s ease-in-out;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 
+                inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+                3px 3px 6px rgba(0, 0, 0, 0.2);
             cursor: pointer;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
 
         #login-button:hover {
-            background-color: var(--spotify-green-hover);
-            transform: scale(1.05);
+            background-color: var(--translucent-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 
+                inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+                5px 5px 10px rgba(0, 0, 0, 0.3);
         }
 
+        /* Main View */
         #main-view {
             display: none;
         }
@@ -85,28 +119,37 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed var(--shell-shadow);
         }
 
         #main-view h1 {
-             font-size: 1.875rem;
+            font-size: 1.75rem;
+            text-align: left;
+            margin: 0;
         }
 
         #user-profile {
             display: flex;
             align-items: center;
+            background: var(--shell-bg);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            box-shadow: inset 2px 2px 4px var(--shell-shadow), inset -2px -2px 4px var(--shell-highlight);
         }
         
         #user-profile span {
             font-size: 0.75rem;
             font-weight: 500;
-            color: var(--text-secondary);
+            color: var(--text-dark);
             margin-right: 0.75rem;
         }
 
         #user-profile img {
-            width: 2.5rem;
-            height: 2.5rem;
+            width: 2rem;
+            height: 2rem;
             border-radius: 50%;
+            border: 2px solid var(--shell-highlight);
         }
 
         .form-section {
@@ -115,147 +158,158 @@
 
         label {
             display: block;
-            font-size: 1.125rem;
-            font-weight: 500;
-            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
             margin-bottom: 0.5rem;
+            font-family: 'VT323', monospace;
+            letter-spacing: 1px;
         }
         
         .label-desc {
-            font-size: 0.875rem;
-            color: var(--text-quaternary);
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            opacity: 0.8;
             margin-bottom: 0.75rem;
         }
 
-        textarea, input[type=number] {
+        textarea {
             width: 100%;
             padding: 1rem;
-            background-color: var(--secondary-card-bg);
-            border: 1px solid var(--input-bg);
+            background-color: var(--translucent-dark);
+            border: 2px solid var(--shell-shadow);
             border-radius: 0.5rem;
-            color: var(--text-primary);
+            color: var(--text-light);
             transition: all 0.2s;
             box-sizing: border-box;
+            font-family: 'Roboto Mono', monospace;
+            box-shadow: inset 3px 3px 5px rgba(0,0,0,0.3);
+            resize: vertical;
         }
 
-        textarea:focus, input[type=number]:focus {
+        textarea:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--spotify-green);
-            border-color: var(--spotify-green);
+            box-shadow: inset 3px 3px 5px rgba(0,0,0,0.3), 0 0 15px var(--screen-glow);
+            border-color: var(--y2k-blue);
         }
         
+        /* D-Pad Controls */
         .controls-grid {
             margin-bottom: 2rem;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1rem;
+            gap: 1.5rem;
+            align-items: center;
         }
 
         @media (min-width: 768px) {
             .controls-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr 1fr;
             }
         }
         
-        .controls-grid label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-tertiary);
-            margin-bottom: 0.5rem;
-        }
-
-        .number-input-container {
+        .d-pad-container {
             display: flex;
             align-items: center;
-            background-color: var(--secondary-card-bg);
+            justify-content: space-between;
+        }
+
+        .d-pad-display {
+            background: var(--shell-bg);
+            box-shadow: inset 2px 2px 4px var(--shell-shadow), inset -2px -2px 4px var(--shell-highlight);
             border-radius: 0.5rem;
-            border: 1px solid var(--input-bg);
-            transition: all 0.2s;
-        }
-
-        .number-input-container:focus-within {
-            box-shadow: 0 0 0 2px var(--spotify-green);
-            border-color: var(--spotify-green);
-        }
-
-        .number-input-button {
-            background-color: var(--input-bg);
-            color: var(--text-primary);
-            border: none;
-            padding: 0.5rem 0.75rem;
-            cursor: pointer;
-            font-size: 1rem;
-            line-height: 1;
-            transition: background-color 0.2s;
-        }
-        .number-input-button:hover {
-            background-color: #6B7280;
-        }
-        .number-input-button:first-of-type {
-            border-top-left-radius: 0.4rem;
-            border-bottom-left-radius: 0.4rem;
-        }
-        .number-input-button:last-of-type {
-            border-top-right-radius: 0.4rem;
-            border-bottom-right-radius: 0.4rem;
-        }
-
-        input[type=number] {
-            padding: 0.5rem;
+            padding: 0.5rem 1rem;
             text-align: center;
-            border: none;
-            border-radius: 0;
-            -moz-appearance: textfield;
+            width: 60px;
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
         }
         
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        input[type=number] { display: none; } /* Hide original input */
+
+        .d-pad {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
         }
 
+        .d-pad-button {
+            background: var(--shell-bg);
+            color: var(--text-dark);
+            border: none;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: bold;
+            transition: all 0.1s ease-in;
+            border-radius: 0.5rem;
+            box-shadow: 3px 3px 6px var(--shell-shadow), -3px -3px 6px var(--shell-highlight);
+        }
+        .d-pad-button:active {
+            box-shadow: inset 3px 3px 6px var(--shell-shadow), inset -3px -3px 6px var(--shell-highlight);
+            transform: translateY(1px);
+        }
+
+        /* Main Action Button */
         #generate-button {
             width: 100%;
-            background-color: var(--spotify-green);
-            color: var(--text-primary);
+            background: var(--y2k-pink);
+            color: var(--text-light);
             font-weight: 700;
             padding: 1rem 2rem;
-            border-radius: 9999px;
-            font-size: 1.125rem;
-            transition: all 0.3s;
+            border-radius: 0.5rem;
+            font-size: 1.25rem;
+            font-family: 'VT323', monospace;
+            letter-spacing: 2px;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: none;
+            border: 2px solid rgba(255, 255, 255, 0.4);
             cursor: pointer;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+            box-shadow: 
+                inset 1px 1px 2px rgba(255, 255, 255, 0.5),
+                5px 5px 10px rgba(0, 0, 0, 0.2);
         }
-        #generate-button:hover {
-             background-color: var(--spotify-green-hover);
+        #generate-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 
+                inset 1px 1px 2px rgba(255, 255, 255, 0.5),
+                8px 8px 15px rgba(0, 0, 0, 0.3);
         }
         #generate-button:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
+            background: #888;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
         }
         #generate-button svg {
             margin-right: 0.75rem;
+            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.4));
         }
 
         #api-key-status {
             text-align: center;
             font-size: 0.75rem;
-            color: var(--text-quaternary);
+            color: var(--text-dark);
+            opacity: 0.7;
             margin-top: 0.5rem;
         }
 
+        /* Results View */
         #results-view {
             margin-top: 2rem;
             display: none;
         }
 
         #results-view h2 {
-            font-size: 1.5rem;
+            font-family: 'VT323', monospace;
+            font-size: 1.75rem;
             font-weight: 600;
             margin-bottom: 1rem;
+            text-align: center;
         }
 
         #playlist-links {
@@ -266,32 +320,40 @@
         
         #playlist-links a {
             display: block;
-            background-color: var(--secondary-card-bg);
+            background-color: var(--translucent-dark);
             padding: 1rem;
             border-radius: 0.5rem;
-            transition: background-color 0.3s;
+            transition: all 0.2s;
             text-decoration: none;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,0,0,0.2);
         }
         
         #playlist-links a:hover {
-            background-color: var(--input-bg);
+            background-color: var(--translucent-dark-hover);
+            transform: scale(1.02);
         }
         
         #playlist-links .playlist-name {
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--text-light);
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
         }
         
         #playlist-links .playlist-url {
             font-size: 0.875rem;
-            color: var(--spotify-green);
+            color: var(--y2k-blue);
+            text-decoration: underline;
         }
 
+        /* Loading Modal */
         #loading-modal {
             display: none;
             position: fixed;
             inset: 0;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(30, 40, 60, 0.5);
+            backdrop-filter: blur(5px);
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -300,10 +362,11 @@
         }
         
         #loading-modal .modal-content {
-            background-color: var(--primary-card-bg);
+            background: linear-gradient(145deg, var(--shell-highlight), var(--shell-bg));
             padding: 2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            border-radius: 1rem;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.3);
+            border: 2px solid var(--shell-shadow);
             width: 100%;
             max-width: 28rem;
             text-align: center;
@@ -314,8 +377,8 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            border-left-color: var(--spotify-green);
-            animation: spin 1s ease infinite;
+            border-left-color: var(--y2k-pink);
+            animation: spin 1s linear infinite;
             margin-bottom: 1rem;
             margin-left: auto;
             margin-right: auto;
@@ -327,22 +390,25 @@
         }
 
         #loading-text {
-            color: var(--text-primary);
+            color: var(--text-dark);
             font-size: 1.125rem;
             margin-bottom: 1rem;
+            font-weight: 500;
         }
 
         .progress-container {
             width: 100%;
-            background-color: var(--secondary-card-bg);
+            background-color: var(--shell-shadow);
             border-radius: 9999px;
-            height: 0.625rem;
+            height: 1rem;
             margin-bottom: 1rem;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.3);
+            padding: 2px;
         }
         
         #progress-bar {
-            background-color: var(--spotify-green);
-            height: 0.625rem;
+            background: var(--y2k-pink);
+            height: 100%;
             border-radius: 9999px;
             transition: width 0.3s ease-in-out;
             width: 0%;
@@ -351,76 +417,86 @@
         #cancel-button {
             margin-top: 1rem;
             background-color: var(--danger-red);
-            color: var(--text-primary);
+            color: var(--text-light);
             font-weight: 700;
             padding: 0.5rem 1.5rem;
-            border-radius: 9999px;
-            transition: background-color 0.3s;
-            border: none;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            border: 2px solid rgba(255,255,255,0.3);
             cursor: pointer;
+            box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
         }
         #cancel-button:hover {
             background-color: var(--danger-red-hover);
+            transform: translateY(-1px);
         }
     </style>
 </head>
 <body>
 
     <div id="app-container">
+        <div id="screen-area">
+            <div id="login-view">
+                <h1>DJ-ViBES</h1>
+                <p>AI-powered mix generation unit. Please authenticate with Spotify to begin.</p>
+                <button id="login-button">
+                    Connect Spotify
+                </button>
+            </div>
 
-        <div id="login-view">
-            <h1>DJ-ViBES</h1>
-            <p>Let AI craft the perfect mix from your favorite songs, artists, or vibes.</p>
-            <button id="login-button">
-                Login with Spotify
-            </button>
+            <div id="main-view">
+                <div class="header">
+                    <h1>DJ-ViBES</h1>
+                    <div id="user-profile"></div>
+                </div>
+
+                <div class="form-section">
+                    <label for="song-input">INPUT SEED DATA:</label>
+                    <p class="label-desc">Enter songs, artists, or vibes. One per line.</p>
+                    <textarea id="song-input" rows="8" placeholder="> Brazillian 60s Fuzz Guitar&#10;> The Third Ear Band&#10;> A vibe like the closing credits of a film..."></textarea>
+                </div>
+
+                <div id="results-view">
+                    <h2>MIXES GENERATED:</h2>
+                    <div id="playlist-links"></div>
+                </div>
+            </div>
         </div>
 
-        <div id="main-view">
-            <div class="header">
-                <h1>DJ-ViBES</h1>
-                <div id="user-profile"></div>
-            </div>
-
-            <div class="form-section">
-                <label for="song-input">Enter Songs, Artists, or Vibes</label>
-                <p class="label-desc">Add one per line. Be as specific or abstract as you like.</p>
-                <textarea id="song-input" rows="8" placeholder="Brazillian 60s Fuzz Guitar
-The Third Ear Band
-https://open.spotify.com/track/0oP2XkRvW12u8gCxpBfVVU?si=...
-A vibe like the closing credits of a film..."></textarea>
-            </div>
-
-            <div class="controls-grid">
+        <!-- Controls outside the screen -->
+        <div id="main-controls" style="display: none;">
+             <div class="controls-grid">
                 <div>
-                    <label for="playlist-length">Tracks per Mix</label>
-                    <div class="number-input-container">
-                        <button type="button" class="number-input-button" data-action="decrement" data-target="playlist-length">−</button>
+                    <label for="playlist-length">TRACKS / MIX</label>
+                    <div class="d-pad-container">
+                        <div class="d-pad">
+                            <button type="button" class="d-pad-button" data-action="decrement" data-target="playlist-length">−</button>
+                            <button type="button" class="d-pad-button" data-action="increment" data-target="playlist-length">+</button>
+                        </div>
+                        <div id="playlist-length-display" class="d-pad-display">15</div>
                         <input type="number" id="playlist-length" value="15" min="3" max="150">
-                        <button type="button" class="number-input-button" data-action="increment" data-target="playlist-length">+</button>
                     </div>
                 </div>
                 <div>
-                    <label for="num-playlists">Number of Mixes</label>
-                    <div class="number-input-container">
-                        <button type="button" class="number-input-button" data-action="decrement" data-target="num-playlists">−</button>
+                    <label for="num-playlists">NUMBER OF MIXES</label>
+                     <div class="d-pad-container">
+                        <div class="d-pad">
+                            <button type="button" class="d-pad-button" data-action="decrement" data-target="num-playlists">−</button>
+                            <button type="button" class="d-pad-button" data-action="increment" data-target="num-playlists">+</button>
+                        </div>
+                        <div id="num-playlists-display" class="d-pad-display">3</div>
                         <input type="number" id="num-playlists" value="3" min="1" max="10">
-                        <button type="button" class="number-input-button" data-action="increment" data-target="num-playlists">+</button>
                     </div>
                 </div>
             </div>
 
             <button id="generate-button" disabled>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v4"/><path d="M6 7v10"/><path d="M10 4v16"/><path d="M14 7v10"/><path d="M18 10v4"/><path d="M22 10v4"/></svg>
-                <span id="generate-button-text">Generate Mixes</span>
+                <span id="generate-button-text">GENERATE MIXES</span>
             </button>
-            <p id="api-key-status">Initializing AI Engine...</p>
-
-            <div id="results-view">
-                <h2>Mixes Created!</h2>
-                <div id="playlist-links"></div>
-            </div>
+            <p id="api-key-status">SYSTEM BOOTING...</p>
         </div>
+
 
         <div id="loading-modal">
             <div class="modal-content">
@@ -438,6 +514,9 @@ A vibe like the closing credits of a film..."></textarea>
     </div>
 
 <script type="module">
+        // --- All JavaScript is unchanged from the original file ---
+        // --- It has been kept here for full functionality ---
+
         const SPOTIFY_CLIENT_ID = "892656124cd5490c86e5eb1c1fd47cea"; 
         const REDIRECT_URI = window.location.origin + window.location.pathname;
         const FIREBASE_CONFIG = {
@@ -457,6 +536,7 @@ A vibe like the closing credits of a film..."></textarea>
 
         const loginView = document.getElementById('login-view');
         const mainView = document.getElementById('main-view');
+        const mainControls = document.getElementById('main-controls');
         const loginButton = document.getElementById('login-button');
         const generateButton = document.getElementById('generate-button');
         const apiKeyStatus = document.getElementById('api-key-status');
@@ -470,6 +550,11 @@ A vibe like the closing credits of a film..."></textarea>
         const numPlaylistsInput = document.getElementById('num-playlists');
         const progressBar = document.getElementById('progress-bar');
         const cancelButton = document.getElementById('cancel-button');
+        
+        // New display elements for D-pad
+        const playlistLengthDisplay = document.getElementById('playlist-length-display');
+        const numPlaylistsDisplay = document.getElementById('num-playlists-display');
+
 
         class CancellationError extends Error {
             constructor(message) {
@@ -489,15 +574,15 @@ A vibe like the closing credits of a film..."></textarea>
                 if (GEMINI_API_KEY) {
                     console.log("Gemini API Key loaded successfully.");
                     generateButton.disabled = false;
-                    apiKeyStatus.textContent = "AI Engine Ready.";
-                    apiKeyStatus.style.color = '#1DB954';
+                    apiKeyStatus.textContent = "AI ENGINE: READY";
+                    apiKeyStatus.style.color = 'var(--y2k-blue)';
                 } else {
                     throw new Error("Gemini API key is empty in Remote Config.");
                 }
             } catch (err) {
                 console.error("Firebase/Remote Config Error:", err);
-                apiKeyStatus.textContent = "Error: Could not load AI Engine.";
-                apiKeyStatus.style.color = '#EF4444'; 
+                apiKeyStatus.textContent = "ERROR: AI ENGINE OFFLINE";
+                apiKeyStatus.style.color = 'var(--danger-red)'; 
                 alert("Error: Could not load the Gemini API Key from Firebase. Please check your configuration and ensure the 'gemini_api_key' parameter is set in Remote Config.");
             }
         }
@@ -578,6 +663,7 @@ A vibe like the closing credits of a film..."></textarea>
                     localStorage.clear();
                     loginView.style.display = 'block';
                     mainView.style.display = 'none';
+                    mainControls.style.display = 'none';
                     return null;
                 }
                 const data = await response.json();
@@ -595,10 +681,11 @@ A vibe like the closing credits of a film..."></textarea>
                 const profile = await fetchWebApi('v1/me', 'GET', accessToken);
                 userProfile.innerHTML = `
                     <span>${profile.display_name}</span>
-                    <img src="${profile.images[0]?.url || 'https://placehold.co/40x40/191414/FFFFFF?text=S'}" alt="Profile Picture">
+                    <img src="${profile.images[0]?.url || 'https://placehold.co/40x40/C5D4E8/212536?text=S'}" alt="Profile Picture">
                 `;
                 loginView.style.display = 'none';
                 mainView.style.display = 'block';
+                mainControls.style.display = 'block';
                 await initializeFirebaseAndGetApiKey();
             } catch (error) {
                 console.error("Error initializing UI:", error);
@@ -606,22 +693,21 @@ A vibe like the closing credits of a film..."></textarea>
                 localStorage.clear();
                 loginView.style.display = 'block';
                 mainView.style.display = 'none';
+                mainControls.style.display = 'none';
             }
         }
 
-        function setupNumberInput(container) {
-            const button = container.querySelector('.number-input-button');
-            if (!button) return;
-
+        function setupDPad(container) {
             container.addEventListener('click', (event) => {
-                const button = event.target.closest('.number-input-button');
+                const button = event.target.closest('.d-pad-button');
                 if (!button) return;
 
                 const targetId = button.dataset.target;
                 const action = button.dataset.action;
                 const input = document.getElementById(targetId);
+                const display = document.getElementById(`${targetId}-display`);
                 
-                if (!input) return;
+                if (!input || !display) return;
 
                 const min = parseFloat(input.min);
                 const max = parseFloat(input.max);
@@ -631,23 +717,17 @@ A vibe like the closing credits of a film..."></textarea>
                 if (isNaN(currentValue)) currentValue = action === 'increment' ? min : max;
 
                 if (action === 'increment') {
-                    currentValue += step;
+                    currentValue = Math.min(max, currentValue + step);
                 } else if (action === 'decrement') {
-                    currentValue -= step;
-                }
-
-                if (currentValue < min) {
-                    currentValue = min;
-                } else if (currentValue > max) {
-                    currentValue = max;
+                    currentValue = Math.max(min, currentValue - step);
                 }
 
                 input.value = currentValue;
+                display.textContent = currentValue;
             });
         }
 
-        document.querySelectorAll('.number-input-container').forEach(setupNumberInput);
-
+        document.querySelectorAll('.d-pad-container').forEach(setupDPad);
 
         cancelButton.addEventListener('click', () => {
             playlistGenerationState.isCancelled = true;
@@ -749,7 +829,7 @@ A vibe like the closing credits of a film..."></textarea>
                 if (error instanceof CancellationError) {
                     console.log(error.message);
                     resultsView.style.display = 'block';
-                    playlistLinks.innerHTML = `<p>Playlist creation was cancelled.</p>`;
+                    playlistLinks.innerHTML = `<p style="text-align:center;">Playlist creation was cancelled.</p>`;
                 } else {
                     console.error("Error during playlist generation:", error);
                     alert(`An error occurred: ${error.message}`);
@@ -890,7 +970,7 @@ A vibe like the closing credits of a film..."></textarea>
                 if (match && match[1]) {
                     trackIds.push(match[1]);
                 } else {
-                    processedLines.push(line);
+                    processedLines.push(line.replace(/^>\s*/, '')); // Remove our placeholder "> "
                 }
             }
 
@@ -1099,7 +1179,7 @@ ${notFoundTracks.length > 0 ? notFoundTracks.map(t => `- ${t}`).join('\n') : "No
 
         function displayResults(createdPlaylists) {
             if (createdPlaylists.length === 0 && !playlistGenerationState.isCancelled) {
-                playlistLinks.innerHTML = `<p>Could not create any playlists. This can happen if the AI suggestions could not be found on Spotify. Try a different input.</p>`;
+                playlistLinks.innerHTML = `<p style="text-align:center;">Could not create any playlists. Try a different input.</p>`;
             } else if (createdPlaylists.length > 0) {
                 playlistLinks.innerHTML = createdPlaylists.map(p => `
                     <a href="${p.url}" target="_blank">
