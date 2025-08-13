@@ -358,7 +358,7 @@ A vibe like the closing credits of a film..."></textarea>
             <div class="controls-grid">
                 <div>
                     <label for="playlist-length">Tracks per Mix</label>
-                    <input type="number" id="playlist-length" value="15" min="3" max="50">
+                    <input type="number" id="playlist-length" value="15" min="3" max="150">
                 </div>
                 <div>
                     <label for="num-playlists">Number of Mixes</label>
@@ -581,18 +581,18 @@ A vibe like the closing credits of a film..."></textarea>
             const playlistLength = parseInt(playlistLengthInput.value, 10);
             const numPlaylists = parseInt(numPlaylistsInput.value, 10);
 
-            if (isNaN(playlistLength) || playlistLength < 3 || playlistLength > 50) {
-                alert("Please set 'Songs per Playlist' between 3 and 50.");
+            if (isNaN(playlistLength) || playlistLength < 3 || playlistLength > 150) {
+                alert("Please set 'Tracks per Mix' between 3 and 150.");
                 hideLoadingModal();
                 return;
             }
             if (isNaN(numPlaylists) || numPlaylists < 1 || numPlaylists > 10) {
-                alert("Please set 'Number of Playlists' between 1 and 10.");
+                alert("Please set 'Number of Mixes' between 1 and 10.");
                 hideLoadingModal();
                 return;
             }
             if ((playlistLength * numPlaylists) > 150) {
-                alert("The total number of songs (Songs per Playlist × Number of Playlists) cannot exceed 150.");
+                alert("The total number of songs (Tracks per Mix × Number of Mixes) cannot exceed 150.");
                 hideLoadingModal();
                 return;
             }
