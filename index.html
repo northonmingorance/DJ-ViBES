@@ -164,18 +164,54 @@
             margin-bottom: 0.5rem;
         }
 
+        .number-input-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--secondary-card-bg);
+            border-radius: 0.5rem;
+            border: 1px solid var(--input-bg);
+            transition: all 0.2s;
+        }
+
+        .number-input-container:focus-within {
+            box-shadow: 0 0 0 2px var(--spotify-green);
+            border-color: var(--spotify-green);
+        }
+
+        .number-input-button {
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+            transition: background-color 0.2s;
+        }
+        .number-input-button:hover {
+            background-color: #6B7280;
+        }
+        .number-input-button:first-of-type {
+            border-top-left-radius: 0.4rem;
+            border-bottom-left-radius: 0.4rem;
+        }
+        .number-input-button:last-of-type {
+            border-top-right-radius: 0.4rem;
+            border-bottom-right-radius: 0.4rem;
+        }
+
         input[type=number] {
             padding: 0.5rem;
             text-align: center;
+            border: none;
+            border-radius: 0;
+            -moz-appearance: textfield;
         }
         
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
-        }
-        input[type=number] {
-            -moz-appearance: textfield;
         }
 
         #generate-button {
@@ -358,11 +394,19 @@ A vibe like the closing credits of a film..."></textarea>
             <div class="controls-grid">
                 <div>
                     <label for="playlist-length">Tracks per Mix</label>
-                    <input type="number" id="playlist-length" value="15" min="3" max="150">
+                    <div class="number-input-container">
+                        <button type="button" class="number-input-button" data-action="decrement" data-target="playlist-length">−</button>
+                        <input type="number" id="playlist-length" value="15" min="3" max="150">
+                        <button type="button" class="number-input-button" data-action="increment" data-target="playlist-length">+</button>
+                    </div>
                 </div>
                 <div>
                     <label for="num-playlists">Number of Mixes</label>
-                    <input type="number" id="num-playlists" value="3" min="1" max="10">
+                    <div class="number-input-container">
+                        <button type="button" class="number-input-button" data-action="decrement" data-target="num-playlists">−</button>
+                        <input type="number" id="num-playlists" value="3" min="1" max="10">
+                        <button type="button" class="number-input-button" data-action="increment" data-target="num-playlists">+</button>
+                    </div>
                 </div>
             </div>
 
@@ -564,6 +608,46 @@ A vibe like the closing credits of a film..."></textarea>
                 mainView.style.display = 'none';
             }
         }
+
+        function setupNumberInput(container) {
+            const button = container.querySelector('.number-input-button');
+            if (!button) return;
+
+            container.addEventListener('click', (event) => {
+                const button = event.target.closest('.number-input-button');
+                if (!button) return;
+
+                const targetId = button.dataset.target;
+                const action = button.dataset.action;
+                const input = document.getElementById(targetId);
+                
+                if (!input) return;
+
+                const min = parseFloat(input.min);
+                const max = parseFloat(input.max);
+                const step = parseFloat(input.step) || 1;
+                let currentValue = parseFloat(input.value);
+
+                if (isNaN(currentValue)) currentValue = action === 'increment' ? min : max;
+
+                if (action === 'increment') {
+                    currentValue += step;
+                } else if (action === 'decrement') {
+                    currentValue -= step;
+                }
+
+                if (currentValue < min) {
+                    currentValue = min;
+                } else if (currentValue > max) {
+                    currentValue = max;
+                }
+
+                input.value = currentValue;
+            });
+        }
+
+        document.querySelectorAll('.number-input-container').forEach(setupNumberInput);
+
 
         cancelButton.addEventListener('click', () => {
             playlistGenerationState.isCancelled = true;
