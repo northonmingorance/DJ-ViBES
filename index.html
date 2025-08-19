@@ -338,7 +338,7 @@
 
         #generate-button {
             width: 100%;
-            background: var(--y2k-green);
+            background: var(--y2k-blue);
             color: var(--text-secondary);
             font-weight: 700;
             padding: 1rem 2rem;
@@ -432,6 +432,22 @@
             text-decoration: underline;
         }
 
+        .playlist-cover {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 40%;
+            margin-top: 0.8rem;
+            margin-bottom: 0.5rem;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .playlist-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
         /* Loading Modal */
         #loading-modal {
             display: none;
@@ -463,7 +479,7 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            border-left-color: var(--y2k-green);
+            border-left-color: var(--y2k-blue);
             animation: spin 1s linear infinite;
             margin-bottom: 1rem;
             margin-left: auto;
@@ -495,7 +511,7 @@
         }
         
         #progress-bar {
-            background: var(--y2k-green);
+            background: var(--y2k-blue);
             height: 100%;
             border-radius: 9999px;
             transition: width 0.3s ease-in-out;
@@ -521,7 +537,6 @@
     </style>
 </head>
 <body>
-    <!-- NEW: Script to apply theme on initial load to prevent flash -->
     <script>
         (function() {
             const theme = localStorage.getItem('theme');
@@ -546,7 +561,6 @@
                     <h1>DJ-ViBES</h1>
                     <div style="display: flex; align-items: center;">
                         <div id="user-profile"></div>
-                        <!-- NEW: Theme toggle button HTML -->
                         <button id="theme-toggle" title="Toggle theme">
                             <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                             <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -557,24 +571,21 @@
                 <div class="form-section">
                     <label for="song-input">INPUT SEED DATA:</label>
                     <p class="label-desc">Enter songs, artists, or vibes. Be as specific or abstract as you like.</p>
-                    <textarea id="song-input" rows="8" placeholder="> Brazillian 60s Fuzz Guitar&#10;> The Third Ear Band&#10;> https://open.spotify.com/track/0oP2XkRvW12u8gCxpBfVVU?si=...&#10;> A vibe like the closing credits of a film..."></textarea>
-                </div>
-
-                <div id="results-view">
-                    <h2>MIXES GENERATED:</h2>
-                    <div id="playlist-links"></div>
+                    <textarea id="song-input" rows="8" placeholder="> Brazillian 60s Fuzz Guitar
+> The Third Ear Band
+> https://open.spotify.com/track/0oP2XkRvW12u8gCxpBfVVU?si=...
+> A vibe like the closing credits of a film..."></textarea>
                 </div>
             </div>
         </div>
 
-        <!-- Controls outside the screen -->
         <div id="main-controls" style="display: none;">
              <div class="controls-grid">
                 <div>
                     <label for="playlist-length">TRACKS / MIX</label>
                     <div class="d-pad-container">
                         <button type="button" class="d-pad-button" data-action="decrement" data-target="playlist-length">−</button>
-                        <input type="number" id="playlist-length" class="d-pad-input" value="15" min="3" max="150">
+                        <input type="number" id="playlist-length" class="d-pad-input" value="7" min="3" max="150">
                         <button type="button" class="d-pad-button" data-action="increment" data-target="playlist-length">+</button>
                     </div>
                 </div>
@@ -582,7 +593,7 @@
                     <label for="num-playlists">NUMBER OF MIXES</label>
                      <div class="d-pad-container">
                         <button type="button" class="d-pad-button" data-action="decrement" data-target="num-playlists">−</button>
-                        <input type="number" id="num-playlists" class="d-pad-input" value="3" min="1" max="10">
+                        <input type="number" id="num-playlists" class="d-pad-input" value="1" min="1" max="10">
                         <button type="button" class="d-pad-button" data-action="increment" data-target="num-playlists">+</button>
                     </div>
                 </div>
@@ -593,6 +604,11 @@
                 <span id="generate-button-text">GENERATE MIXES</span>
             </button>
             <p id="api-key-status">SYSTEM BOOTING...</p>
+
+            <div id="results-view">
+                <h2>MIXES GENERATED:</h2>
+                <div id="playlist-links"></div>
+            </div>
         </div>
 
 
@@ -612,10 +628,6 @@
     </div>
 
 <script type="module">
-        // --- All original JavaScript is unchanged ---
-        // --- It has been kept here for full functionality ---
-        // --- NEW theme toggle logic is added below ---
-
         const SPOTIFY_CLIENT_ID = "892656124cd5490c86e5eb1c1fd47cea"; 
         const REDIRECT_URI = window.location.origin + window.location.pathname;
         const FIREBASE_CONFIG = {
@@ -632,6 +644,8 @@
 
         let GEMINI_API_KEY = "";
         let playlistGenerationState = { isCancelled: false };
+        // NEW: Global array to hold playlist proposals before user confirmation
+        let playlistProposals = [];
 
         const loginView = document.getElementById('login-view');
         const mainView = document.getElementById('main-view');
@@ -649,9 +663,9 @@
         const numPlaylistsInput = document.getElementById('num-playlists');
         const progressBar = document.getElementById('progress-bar');
         const cancelButton = document.getElementById('cancel-button');
-        const themeToggleButton = document.getElementById('theme-toggle'); // NEW
+        const themeToggleButton = document.getElementById('theme-toggle');
 
-        // --- NEW: Theme Toggle Logic ---
+        // --- Theme Toggle Logic ---
         themeToggleButton.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             let currentTheme = 'light';
@@ -713,7 +727,7 @@
             const codeVerifier = generateRandomString(64);
             const codeChallenge = await generateCodeChallenge(codeVerifier);
             localStorage.setItem('spotify_code_verifier', codeVerifier);
-            const scope = 'playlist-modify-public playlist-modify-private';
+            const scope = 'playlist-modify-public playlist-modify-private ugc-image-upload';
             const authUrl = new URL("https://accounts.spotify.com/authorize");
             const params = {
                 response_type: 'code',
@@ -855,8 +869,10 @@
             console.log("Cancellation requested by user.");
         });
 
+        // MODIFIED: This function now handles PHASE 1 (Generation & Proposal)
         generateButton.addEventListener('click', async () => {
             playlistGenerationState.isCancelled = false;
+            playlistProposals = []; // Clear previous proposals
             resultsView.style.display = 'none';
             playlistLinks.innerHTML = '';
             showLoadingModal("Processing your input...");
@@ -865,6 +881,7 @@
             const playlistLength = parseInt(playlistLengthInput.value, 10);
             const numPlaylists = parseInt(numPlaylistsInput.value, 10);
 
+            // Input validation remains the same
             if (isNaN(playlistLength) || playlistLength < 3 || playlistLength > 150) {
                 alert("Please set 'Tracks per Mix' between 3 and 150.");
                 hideLoadingModal();
@@ -904,19 +921,14 @@
                 if (playlistGenerationState.isCancelled) throw new CancellationError("Cancelled after Gemini call.");
                 
                 const playlistsToCreate = geminiResponse.curated_playlists;
-
                 if (!playlistsToCreate || playlistsToCreate.length === 0) {
                     throw new Error("Gemini didn't return any playlists. Try rephrasing your input.");
                 }
 
                 updateProgress(20, "AI ideas received. Preparing to create playlists...");
-                const user = await fetchWebApi('v1/me', 'GET', accessToken);
-                const userId = user.id;
-                const createdPlaylistData = [];
                 const totalPlaylists = playlistsToCreate.length;
-
                 const loopProgressStart = 20;
-                const loopProgressWeight = 75;
+                const loopProgressWeight = 80; // Increased weight as this is the main work now
 
                 for (const [index, playlist] of playlistsToCreate.entries()) {
                     if (playlistGenerationState.isCancelled) throw new CancellationError("Cancelled during playlist creation loop.");
@@ -924,40 +936,298 @@
                     const playlistBaseProgress = loopProgressStart + (index / totalPlaylists) * loopProgressWeight;
                     const weightForThisPlaylist = loopProgressWeight / totalPlaylists;
 
-                    const finalTrackUris = await fillPlaylistToLength(playlist, playlistLength, accessToken, index, totalPlaylists, playlistBaseProgress, weightForThisPlaylist);
+                    // This function finds all the song URIs, which is what we need
+                    const finalTrackUrisMap = await fillPlaylistToLength(playlist, playlistLength, accessToken, index, totalPlaylists, playlistBaseProgress, weightForThisPlaylist);
 
                     if (playlistGenerationState.isCancelled) throw new CancellationError("Cancelled during track finding.");
-
-                    if (finalTrackUris.length > 0) {
-                        const createProgress = playlistBaseProgress + (weightForThisPlaylist * 0.95);
-                        updateProgress(createProgress, `[${index + 1}/${totalPlaylists}] Creating playlist on Spotify...`);
-                        
-                        const newPlaylist = await createSpotifyPlaylist(userId, playlist.playlist_title, playlist.playlist_description, accessToken);
-                        await addTracksToPlaylist(newPlaylist.id, finalTrackUris, accessToken);
-                        createdPlaylistData.push({ name: newPlaylist.name, url: newPlaylist.external_urls.spotify });
+                    
+                    // Instead of creating the playlist, we store the proposal
+                    if (finalTrackUrisMap.size > 0) {
+                        playlistProposals.push({
+                            geminiData: playlist,
+                            trackUris: Array.from(finalTrackUrisMap.keys()),
+                            trackNames: Array.from(finalTrackUrisMap.values())
+                        });
                     } else {
-                         console.warn(`Skipping playlist "${playlist.playlist_title}" as no valid tracks could be found.`);
+                         console.warn(`Skipping playlist proposal for "${playlist.playlist_title}" as no valid tracks could be found.`);
                     }
 
                     const finalPlaylistProgress = loopProgressStart + ((index + 1) / totalPlaylists) * loopProgressWeight;
-                    updateProgress(finalPlaylistProgress, `[${index + 1}/${totalPlaylists}] Playlist "${playlist.playlist_title}" created!`);
+                    updateProgress(finalPlaylistProgress, `[${index + 1}/${totalPlaylists}] Proposal for "${playlist.playlist_title}" ready!`);
                 }
-                updateProgress(100, "All playlists created!");
-                displayResults(createdPlaylistData);
+
+                updateProgress(100, "All proposals generated!");
+                
+                // NEW: Display the confirmation view instead of final results
+                displayConfirmationView(playlistProposals);
 
             } catch (error) {
                 if (error instanceof CancellationError) {
                     console.log(error.message);
                     resultsView.style.display = 'block';
-                    playlistLinks.innerHTML = `<p style="text-align:center;">Playlist creation was cancelled.</p>`;
+                    playlistLinks.innerHTML = `<p style="text-align:center;">Playlist generation was cancelled.</p>`;
                 } else {
-                    console.error("Error during playlist generation:", error);
+                    console.error("Error during playlist proposal generation:", error);
                     alert(`An error occurred: ${error.message}`);
                 }
             } finally {
-                setTimeout(hideLoadingModal, 1000);
+                setTimeout(hideLoadingModal, 500); // Shorter delay
             }
         });
+        
+        // NEW: Event listener for the confirmation buttons (handles PHASE 2)
+        playlistLinks.addEventListener('click', async (event) => {
+            const createButton = event.target.closest('.confirm-create-button');
+            if (createButton) {
+                const proposalIndex = parseInt(createButton.dataset.proposalIndex, 10);
+                await handlePlaylistCreation(proposalIndex, createButton);
+            }
+        });
+
+        // NEW: The core logic for creating a single playlist on Spotify
+        async function handlePlaylistCreation(index, button) {
+            button.disabled = true;
+            button.textContent = 'Creating...';
+            
+            const proposal = playlistProposals[index];
+            if (!proposal) {
+                console.error("Could not find proposal for index:", index);
+                button.textContent = 'Error!';
+                return;
+            }
+
+            try {
+                const accessToken = await getValidAccessToken();
+                const user = await fetchWebApi('v1/me', 'GET', accessToken);
+
+                // 1. Create the playlist
+                button.textContent = 'Creating playlist...';
+                const newPlaylist = await createSpotifyPlaylist(user.id, proposal.geminiData.playlist_title, proposal.geminiData.playlist_description, accessToken);
+
+                // 2. Add tracks
+                button.textContent = 'Adding tracks...';
+                await addTracksToPlaylist(newPlaylist.id, proposal.trackUris, accessToken);
+                
+                // 3. Generate and upload cover art
+                button.textContent = 'Generating cover art...';
+                const coverImage = await generatePlaylistCoverImage(
+                    proposal.geminiData.playlist_title,
+                    proposal.geminiData.playlist_description,
+                    proposal.geminiData.tracks
+                );
+                button.textContent = 'Uploading cover...';
+                await uploadPlaylistCover(newPlaylist.id, coverImage, accessToken);
+
+                // 4. Success! Replace the card with the final link
+                const finalPlaylistData = {
+                    name: newPlaylist.name,
+                    description: proposal.geminiData.playlist_description,
+                    url: newPlaylist.external_urls.spotify,
+                    image: coverImage
+                };
+                const proposalCard = document.getElementById(`proposal-card-${index}`);
+                if(proposalCard) {
+                    proposalCard.outerHTML = `
+                        <a href="${finalPlaylistData.url}" target="_blank">
+                            <img src="${finalPlaylistData.image}" alt="${finalPlaylistData.name} cover" class="playlist-cover">
+                            <p class="playlist-name">${finalPlaylistData.name}</p>
+                            <p class="playlist-description">${finalPlaylistData.description || ''}</p>
+                            <p class="playlist-url">Open on Spotify →</p>
+                        </a>
+                    `;
+                }
+
+            } catch (error) {
+                console.error("Error creating playlist on demand:", error);
+                button.textContent = 'Creation Failed!';
+                button.style.backgroundColor = 'var(--danger-red)';
+            }
+        }
+        
+        // NEW: Function to display the playlist proposals for user confirmation
+        function displayConfirmationView(proposals) {
+            if (proposals.length === 0 && !playlistGenerationState.isCancelled) {
+                playlistLinks.innerHTML = `<p style="text-align:center;">Could not generate any valid proposals. Try a different input.</p>`;
+            } else if (proposals.length > 0) {
+                playlistLinks.innerHTML = proposals.map((p, index) => `
+                    <div class="playlist-proposal" id="proposal-card-${index}">
+                        <div class="proposal-details">
+                            <h3 class="playlist-name">${p.geminiData.playlist_title}</h3>
+                            <p class="playlist-description">${p.geminiData.playlist_description}</p>
+                            <h4>Tracklist:</h4>
+                            <ol class="track-list">
+                                ${p.trackNames.map(name => `<li>${name}</li>`).join('')}
+                            </ol>
+                            <button class="confirm-create-button" data-proposal-index="${index}">
+                                ✓ Create this Mix on Spotify
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            resultsView.style.display = 'block';
+        }
+
+        // NEW: Add some basic styling for the new confirmation view.
+        // You can add this inside your <style> tag in the <head>.
+        const proposalStyles = `
+            .playlist-proposal {
+                background-color: var(--translucent-dark-bg);
+                padding: 1.5rem;
+                border-radius: 0.5rem;
+                margin-bottom: 1rem;
+                box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+                border: 1px solid rgba(0,0,0,0.2);
+            }
+            .playlist-proposal h3 { color: var(--text-secondary); font-family: 'VT323', monospace; font-size: 1.4rem; margin-top: 0; }
+            .playlist-proposal h4 { color: var(--text-secondary); font-size: 1rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem; }
+            .track-list { 
+                color: var(--text-secondary); 
+                opacity: 0.9; 
+                padding-left: 0; /* <-- ADJUST THIS */
+                list-style-position: inside; /* <-- ADD THIS */
+                margin-top: 0; 
+                max-height: 200px; 
+                overflow-y: auto; 
+            }
+            .track-list li { margin-bottom: 0.25rem; font-size: 0.85rem; }
+            .confirm-create-button {
+                display: block;
+                width: 100%;
+                margin-top: 1.5rem;
+                background: var(--y2k-green);
+                color: var(--text-secondary);
+                font-weight: 700;
+                padding: 0.75rem 1rem;
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                cursor: pointer;
+                border: 1px solid rgba(255,255,255,0.4);
+                transition: all 0.2s ease;
+            }
+            .confirm-create-button:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
+            }
+            .confirm-create-button:disabled {
+                background: #555;
+                cursor: not-allowed;
+            }
+        `;
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = proposalStyles;
+        document.head.appendChild(styleSheet);
+
+        async function generatePlaylistCoverImage(title, description, tracks) {
+            if (!GEMINI_API_KEY) throw new Error("Gemini API Key not loaded.");
+
+            const prompt = `
+        Create a square, highly detailed and professional playlist cover art. DO NOT include any text on the image. Make sure it expresses the theme of the playlist.
+        Playlist title: "${title}"
+        Playlist description: "${description}"`;
+
+            const api_url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${GEMINI_API_KEY}`;
+
+            const response = await fetch(api_url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            role: "user",
+                            parts: [{ text: prompt }]
+                        }
+                    ],
+                    generationConfig: {
+                        responseModalities: ["TEXT", "IMAGE"]
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Image generation failed: ${await response.text()}`);
+            }
+
+            const data = await response.json();
+
+            // Extract first image from inlineData
+            let base64Image = null;
+            for (const part of data.candidates?.[0]?.content?.parts || []) {
+                if (part.inlineData?.mimeType?.startsWith("image/")) {
+                    base64Image = part.inlineData.data;
+                    break;
+                }
+            }
+
+            if (!base64Image) throw new Error("No image returned from Gemini.");
+            return `data:image/png;base64,${base64Image}`;
+        }
+
+        async function uploadPlaylistCover(playlistId, base64Image) {
+            // Always get fresh token to avoid CORS from stale access
+            const accessToken = await getValidAccessToken();
+            if (!accessToken) throw new Error("No valid Spotify access token available");
+
+            console.log("🎵 Uploading cover for playlist:", playlistId);
+
+            // Load image into canvas
+            const img = await fetch(base64Image).then(r => r.blob());
+            const bitmap = await createImageBitmap(img);
+
+            let targetSize = 512;
+            let quality = 0.8;
+            const MAX_BYTES = 256000;
+
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+
+            let jpegBase64;
+            let blobSize;
+
+            while (true) {
+                canvas.width = targetSize;
+                canvas.height = targetSize;
+                ctx.clearRect(0, 0, targetSize, targetSize);
+                ctx.drawImage(bitmap, 0, 0, targetSize, targetSize);
+
+                jpegBase64 = canvas.toDataURL("image/jpeg", quality).replace(/^data:image\/jpeg;base64,/, '');
+                const jpegBlob = await (await fetch(`data:image/jpeg;base64,${jpegBase64}`)).blob();
+                blobSize = jpegBlob.size;
+
+                console.log(`📏 Size: ${blobSize} bytes | Q=${quality} | Res=${targetSize}x${targetSize}`);
+
+                if (blobSize <= MAX_BYTES) break;
+
+                // Reduce resolution first, then quality
+                if (targetSize > 256) {
+                    targetSize = Math.floor(targetSize * 0.85);
+                } else {
+                    quality = Math.max(0.1, quality - 0.05);
+                }
+
+                if (quality <= 0.1 && targetSize <= 128) {
+                    console.warn("⚠️ Could not compress enough without heavy quality loss.");
+                    break;
+                }
+            }
+
+            // Upload to Spotify
+            const res = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'image/jpeg'
+                },
+                body: jpegBase64
+            });
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(`Spotify cover upload failed: ${res.status} ${errorText}`);
+            }
+
+            console.log(`✅ Uploaded cover: ${blobSize} bytes @ ${targetSize}x${targetSize}, Q=${quality}`);
+        }
 
         async function fillPlaylistToLength(playlist, desiredLength, accessToken, playlistIndex, totalPlaylists, baseProgress, progressWeight) {
             let finalUris = new Map();
@@ -968,7 +1238,7 @@
             const MAX_CONSECUTIVE_FAILS = 3;
 
             while (finalUris.size < desiredLength) {
-                if (playlistGenerationState.isCancelled) return [];
+                if (playlistGenerationState.isCancelled) return new Map();
                 const deficit = desiredLength - finalUris.size;
                 if (deficit <= 0) break;
 
@@ -980,7 +1250,7 @@
 
 
                 if (allSuggestedTracks.length < deficit) {
-                    if (playlistGenerationState.isCancelled) return [];
+                    if (playlistGenerationState.isCancelled) return new Map();
                     console.log(`Pool is low (${allSuggestedTracks.length} tracks). Requesting more from Gemini.`);
                     
                     const foundTrackNames = Array.from(finalUris.values());
@@ -1043,7 +1313,7 @@
                 console.log(`Successfully filled playlist "${playlist.playlist_title}" with ${finalUris.size} songs.`);
             }
 
-            return Array.from(finalUris.keys());
+            return finalUris; // MODIFIED: Return the whole Map
         }
 
         async function callGeminiWithRetries(userInput, numPlaylists, songsPerPlaylist, maxRetries = 3) {
@@ -1112,10 +1382,10 @@
         
         async function callGeminiApi(userInput, numPlaylists, songsPerPlaylist) {
             if (!GEMINI_API_KEY) throw new Error("Gemini API Key is not loaded.");
-            
+
             const prompt = `
 # Role & Goal
-You are DJ-ViBES, an expert music curator. Your goal is to interpret a user's input, which can be a mix of songs, artists, Spotify links, genres, or abstract "vibes", and then craft multiple, curated playlists.
+You are DJ-ViBES, an expert music curator with access to a real-time search tool to ensure all your suggestions are accurate. Your goal is to interpret a user's input and craft multiple, curated playlists based on real, verifiable songs.
 
 # Input Analysis
 The user has provided the following input. It could be anything from specific tracks to moods. Interpret the collective essence of this list.
@@ -1124,24 +1394,22 @@ ${userInput.join('\n')}
 
 # Core Instructions
 1.  Analyze the user's input to understand the desired musical atmosphere, genres, and themes.
-2.  Create exactly ${numPlaylists} distinct playlists that capture different facets of the user's request.
-3.  For EACH playlist, generate a list of exactly ${songsPerPlaylist} songs.
-4.  The generated tracks should be relevant but should NOT include any songs that were explicitly in the user's input list, unless the input specifically asks for it, e.g.: "the best of …".
-5.  Do not repeat song suggestions across the different playlists you create.
-6.  Give each playlist a creative, descriptive title and a brief description.
-7.  Arrange the tracks in a logical sequence that flows well.
+2.  **Use your search tool to find real songs and artists that match the user's vibe.**
+3.  Create exactly ${numPlaylists} distinct playlists.
+4.  For EACH playlist, generate a list of exactly ${songsPerPlaylist} songs.
+5.  Give each playlist a creative, descriptive title and a brief description.
 
 # Rules & Constraints
 - Your ENTIRE response MUST be a single, valid JSON object.
+- **You must use your search tool to ensure song titles and artist names are accurate and exist on music platforms.**
 - Do not include any text, notes, or apologies outside of the JSON structure.
 - Do not use markdown backticks like \`\`\`json in your response.
-- Ensure song titles and artist names are as accurate as possible to maximize findability on Spotify.
 
 # JSON Output Structure
 {"curated_playlists":[{"playlist_title":"string","playlist_description":"string","tracks":[{"song_title":"string","artist":"string"}]}]}
 `;
             const api_url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
-            
+
             let responseText = "";
             try {
                 const response = await fetch(api_url, {
@@ -1149,7 +1417,10 @@ ${userInput.join('\n')}
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { responseMimeType: "application/json" }
+                        tools: [{
+                            "googleSearch": {}
+                        }]
+                        // REMOVED: The responseMimeType setting that caused the conflict.
                     })
                 });
 
@@ -1167,7 +1438,12 @@ ${userInput.join('\n')}
                 }
 
                 responseText = data.candidates[0].content.parts[0].text;
-                return JSON.parse(responseText);
+
+                // ADDED: A more robust JSON parsing logic.
+                // This cleans up potential markdown formatting from the model's response.
+                const cleanedText = responseText.replace(/^```json\s*|```$/g, '').trim();
+                return JSON.parse(cleanedText);
+
             } catch (e) {
                 console.error("Failed to parse initial Gemini JSON response:", e);
                 if (responseText) {
@@ -1183,12 +1459,12 @@ ${userInput.join('\n')}
                 return [];
             }
             if (playlistGenerationState.isCancelled) return [];
-            
+
             const tracksToRequest = deficit + 5;
 
             const prompt = `
 # Role & Goal
-You are an assistant to DJ-ViBES. Your task is to find replacement songs for a playlist because some of the previous suggestions could not be found on Spotify.
+You are an assistant to DJ-ViBES. Your task is to find real, verifiable replacement songs for a playlist using your search tool.
 
 # Playlist Context
 - **Playlist Title:** "${playlist.playlist_title}"
@@ -1199,21 +1475,18 @@ ${foundTrackNames.length > 0 ? foundTrackNames.map(t => `- ${t}`).join('\n') : "
 ${notFoundTracks.length > 0 ? notFoundTracks.map(t => `- ${t}`).join('\n') : "None."}
 
 # Core Instructions
-1.  Analyze the playlist context and the lists of found/failed songs to understand the vibe.
-2.  Generate a list of exactly ${tracksToRequest} NEW song suggestions that fit this vibe.
-3.  **Crucially, DO NOT suggest any songs from the "found" or "failed" lists above.**
-4.  Provide only real songs with accurate artist and title information.
+1.  Analyze the playlist context to understand the vibe.
+2.  **Use your search tool to find exactly ${tracksToRequest} NEW, real song suggestions that fit this vibe.**
+3.  **DO NOT suggest any songs from the "found" or "failed" lists above.**
 
 # Rules & Constraints
-- Your ENTIRE response MUST be a single, valid JSON object.
-- Do not include any text, notes, or apologies outside of the JSON structure.
-- Do not use markdown backticks like \`\`\`json in your response.
+- Your ENTIRE response MUST be a single, valid JSON object without any other text or markdown.
 
 # JSON Output Structure
 {"tracks":[{"song_title":"string","artist":"string"}]}
 `;
             const api_url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
-            
+
             let responseText = "";
             try {
                 const response = await fetch(api_url, {
@@ -1221,7 +1494,10 @@ ${notFoundTracks.length > 0 ? notFoundTracks.map(t => `- ${t}`).join('\n') : "No
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { responseMimeType: "application/json" }
+                        tools: [{
+                            "googleSearch": {}
+                        }]
+                        // REMOVED: The responseMimeType setting that caused the conflict.
                     })
                 });
 
@@ -1230,19 +1506,22 @@ ${notFoundTracks.length > 0 ? notFoundTracks.map(t => `- ${t}`).join('\n') : "No
                     console.error("Supplementary Gemini API call failed with status:", response.status, "Body:", errorBody);
                     throw new Error(`Supplementary Gemini API call failed with status ${response.status}`);
                 }
-                
+
                 const data = await response.json();
-                
+
                 if (!data.candidates || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0].text) {
                     console.error("Invalid response structure from supplementary Gemini call:", data);
                     throw new Error("Malformed response structure from Gemini.");
                 }
 
                 responseText = data.candidates[0].content.parts[0].text;
-                const parsedJson = JSON.parse(responseText);
+                
+                // ADDED: A more robust JSON parsing logic.
+                const cleanedText = responseText.replace(/^```json\s*|```$/g, '').trim();
+                const parsedJson = JSON.parse(cleanedText);
                 return parsedJson.tracks || [];
 
-            } catch(e) {
+            } catch (e) {
                 console.error("Failed to get or parse supplementary tracks from Gemini:", e);
                 if (responseText) {
                     console.error("Raw text from Gemini that failed to parse:", responseText);
@@ -1295,20 +1574,6 @@ ${notFoundTracks.length > 0 ? notFoundTracks.map(t => `- ${t}`).join('\n') : "No
                     uris: chunk
                 });
             }
-        }
-
-        function displayResults(createdPlaylists) {
-            if (createdPlaylists.length === 0 && !playlistGenerationState.isCancelled) {
-                playlistLinks.innerHTML = `<p style="text-align:center;">Could not create any playlists. Try a different input.</p>`;
-            } else if (createdPlaylists.length > 0) {
-                playlistLinks.innerHTML = createdPlaylists.map(p => `
-                    <a href="${p.url}" target="_blank">
-                        <p class="playlist-name">${p.name}</p>
-                        <p class="playlist-url">Open on Spotify →</p>
-                    </a>
-                `).join('');
-            }
-            resultsView.style.display = 'block';
         }
 
         async function fetchWebApi(endpoint, method, token, body) {
