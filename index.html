@@ -630,19 +630,7 @@
 <script type="module">
         const SPOTIFY_CLIENT_ID = "892656124cd5490c86e5eb1c1fd47cea"; 
         const REDIRECT_URI = window.location.origin + window.location.pathname;
-        const FIREBASE_CONFIG = {
-          apiKey: "AIzaSyCVWUnnXiOvKRqbvngafdZC7DedEY-7vpg",
-          authDomain: "lifexpapp-f5578.firebaseapp.com",
-          projectId: "lifexpapp-f5578",
-          storageBucket: "lifexpapp-f5578.appspot.com",
-          messagingSenderId: "194098013746",
-          appId: "1:194098013746:web:720ba296ee9e40dee37e2b"
-        };
-        
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getRemoteConfig, fetchAndActivate, getString } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-remote-config.js";
 
-        let GEMINI_API_KEY = "";
         let playlistGenerationState = { isCancelled: false };
         // NEW: Global array to hold playlist proposals before user confirmation
         let playlistProposals = [];
@@ -679,30 +667,6 @@
             constructor(message) {
                 super(message);
                 this.name = "CancellationError";
-            }
-        }
-
-        async function initializeFirebaseAndGetApiKey() {
-            try {
-                const app = initializeApp(FIREBASE_CONFIG);
-                const remoteConfig = getRemoteConfig(app);
-                remoteConfig.settings.minimumFetchIntervalMillis = 0; 
-                await fetchAndActivate(remoteConfig);
-                GEMINI_API_KEY = getString(remoteConfig, "gemini_api_key");
-
-                if (GEMINI_API_KEY) {
-                    console.log("Gemini API Key loaded successfully.");
-                    generateButton.disabled = false;
-                    apiKeyStatus.textContent = "AI ENGINE: READY";
-                    apiKeyStatus.style.color = 'var(--y2k-blue)';
-                } else {
-                    throw new Error("Gemini API key is empty in Remote Config.");
-                }
-            } catch (err) {
-                console.error("Firebase/Remote Config Error:", err);
-                apiKeyStatus.textContent = "ERROR: AI ENGINE OFFLINE";
-                apiKeyStatus.style.color = 'var(--danger-red)'; 
-                console.error("Error: Could not load the Gemini API Key from Firebase. Please check your configuration and ensure the 'gemini_api_key' parameter is set in Remote Config.");
             }
         }
 
@@ -804,7 +768,6 @@
                 loginView.style.display = 'none';
                 mainView.style.display = 'block';
                 mainControls.style.display = 'block';
-                await initializeFirebaseAndGetApiKey();
             } catch (error) {
                 console.error("Error initializing UI:", error);
                 localStorage.clear();
@@ -1119,28 +1082,43 @@
         document.head.appendChild(styleSheet);
 
         async function generatePlaylistCoverImage(title, description, tracks) {
-            if (!GEMINI_API_KEY) throw new Error("Gemini API Key not loaded.");
+
+            const CLOUD_FUNCTION_URL = "https://us-central1-lifexpapp-f5578.cloudfunctions.net/callGeminiApi";
 
             const prompt = `
-        Create a square, highly detailed and professional playlist cover art. DO NOT include any text on the image. Make sure it expresses the theme of the playlist.
-        Playlist title: "${title}"
-        Playlist description: "${description}"`;
+# Role & Goal
+You are a master visual artist, a Cover Art Conjurer, known for translating sound into stunning imagery. The legendary DJ-ViBES has personally commissioned you to create the face for his latest playlist. Your goal is to design a square, text-free piece of art that visually encapsulates the playlist's very soul.
 
-            const api_url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${GEMINI_API_KEY}`;
+# The Creative Brief
+This is the feeling you need to capture in a single, powerful image. Let the title and description guide your artistic vision.
 
-            const response = await fetch(api_url, {
+- **Playlist Title:** "${title}"
+- **Playlist Vibe (Description):** "${description}"
+
+# Artistic Mandate
+1.  **Visualize the Vibe:** Meditate on the title and description. What colors, textures, moods, and scenes do they evoke? Your task is to translate that feeling into a professional and highly detailed piece of art.
+2.  **Create an Iconic Image:** This isn't just a background; it's a statement. The final image should be striking, memorable, and a pure visual representation of the music's theme.
+3.  **No Words Needed:** The image must speak for itself. **Absolutely no text, titles, or letters should appear on the cover art.** The visual must carry the entire narrative.
+
+# Technical Specifications
+- **Format:** Square (1:1 aspect ratio)
+- **Detail Level:** High
+- **Style:** Professional and thematically aligned with the creative brief.
+            `;
+
+            const geminiRequestBody = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseModalities: ["TEXT", "IMAGE"]
+                }
+            };
+
+            const response = await fetch(CLOUD_FUNCTION_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [
-                        {
-                            role: "user",
-                            parts: [{ text: prompt }]
-                        }
-                    ],
-                    generationConfig: {
-                        responseModalities: ["TEXT", "IMAGE"]
-                    }
+                    model: 'gemini-2.0-flash-preview-image-generation',
+                    body: geminiRequestBody
                 })
             });
 
@@ -1381,46 +1359,49 @@
         }
         
         async function callGeminiApi(userInput, numPlaylists, songsPerPlaylist) {
-            if (!GEMINI_API_KEY) throw new Error("Gemini API Key is not loaded.");
+
+            const CLOUD_FUNCTION_URL = "https://us-central1-lifexpapp-f5578.cloudfunctions.net/callGeminiApi";
 
             const prompt = `
 # Role & Goal
-You are DJ-ViBES, an expert music curator with access to a real-time search tool to ensure all your suggestions are accurate. Your goal is to interpret a user's input and craft multiple, curated playlists based on real, verifiable songs.
+You are DJ-ViBES, a legendary music curator and vibe architect. Your playlists aren't just lists of songs; they're auditory experiences. You have a knack for bottling a feeling into a playlist and giving it a name and story that resonates. Your goal is to interpret a user's input and craft multiple, distinct playlists based on real, verifiable songs, using your real-time search tool to ensure accuracy.
 
 # Input Analysis
-The user has provided the following input. It could be anything from specific tracks to moods. Interpret the collective essence of this list.
+The user has provided a vibe, a song, an artist, or a feeling. Your task is to decode their request and distill its essence into curated musical journeys.
 User Input:
 ${userInput.join('\n')}
 
 # Core Instructions
-1.  Analyze the user's input to understand the desired musical atmosphere, genres, and themes.
-2.  **Use your search tool to find real songs and artists that match the user's vibe.**
-3.  Create exactly ${numPlaylists} distinct playlists.
+1.  Analyze the user's input to deeply understand the desired musical atmosphere, genres, and emotional core.
+2.  **Use your search tool to find real songs and artists that perfectly match the user's intended vibe.**
+3.  Create exactly ${numPlaylists} distinct playlists, each offering a unique take or angle on the user's request.
 4.  For EACH playlist, generate a list of exactly ${songsPerPlaylist} songs.
-5.  Give each playlist a creative, descriptive title and a brief description.
+5.  **Craft the Vibe:** This is where your personality shines.
+    * **Playlist Title:** Give each playlist an imaginative and catchy title. Go beyond the literal. Think movie titles, poetic phrases, or a specific, relatable scenario (e.g., "Neon Reflections in a Rain Puddle," not "Sad Electronic Music"). Do not divide titles into subtitles using ":", ",", ";", or "-". Titles should be a single sentence.
+    * **Playlist Description:** Write a short, vibrant description (1-2 sentences) that paints a picture and evokes a feeling. What's the setting? What's the core emotion? Make the listener *feel* the playlist before they even press play.
 
 # Rules & Constraints
 - Your ENTIRE response MUST be a single, valid JSON object.
-- **You must use your search tool to ensure song titles and artist names are accurate and exist on music platforms.**
-- Do not include any text, notes, or apologies outside of the JSON structure.
+- **You must use your search tool to ensure all song titles and artist names are accurate and exist on major music platforms.**
+- Do not include any text, notes, or apologies outside of the final JSON structure.
 - Do not use markdown backticks like \`\`\`json in your response.
 
 # JSON Output Structure
 {"curated_playlists":[{"playlist_title":"string","playlist_description":"string","tracks":[{"song_title":"string","artist":"string"}]}]}
 `;
-            const api_url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+            const geminiRequestBody = {
+                contents: [{ parts: [{ text: prompt }] }],
+                tools: [{ "googleSearch": {} }]
+            };
 
             let responseText = "";
             try {
-                const response = await fetch(api_url, {
+                const response = await fetch(CLOUD_FUNCTION_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        tools: [{
-                            "googleSearch": {}
-                        }]
-                        // REMOVED: The responseMimeType setting that caused the conflict.
+                        model: 'gemini-2.5-flash-preview-05-20',
+                        body: geminiRequestBody
                     })
                 });
 
@@ -1439,8 +1420,6 @@ ${userInput.join('\n')}
 
                 responseText = data.candidates[0].content.parts[0].text;
 
-                // ADDED: A more robust JSON parsing logic.
-                // This cleans up potential markdown formatting from the model's response.
                 const cleanedText = responseText.replace(/^```json\s*|```$/g, '').trim();
                 return JSON.parse(cleanedText);
 
@@ -1454,50 +1433,51 @@ ${userInput.join('\n')}
         }
 
         async function getSupplementaryTracksFromGemini(playlist, foundTrackNames, notFoundTracks, deficit, accessToken) {
-            if (!GEMINI_API_KEY) {
-                console.error("Attempted to call supplementary Gemini without API Key.");
-                return [];
-            }
             if (playlistGenerationState.isCancelled) return [];
 
             const tracksToRequest = deficit + 5;
+            
+            const CLOUD_FUNCTION_URL = "https://us-central1-lifexpapp-f5578.cloudfunctions.net/callGeminiApi";
 
             const prompt = `
 # Role & Goal
-You are an assistant to DJ-ViBES. Your task is to find real, verifiable replacement songs for a playlist using your search tool.
+You are the trusted Vibe Scout for the legendary DJ-ViBES. He's building a new mix but hit a snag, and he trusts your expert ear to find the missing pieces. Your mission is to use your search tool to unearth perfect, verifiable tracks that complete the sonic tapestry he's weaving.
 
-# Playlist Context
+# The Mission Brief
+DJ-ViBES has sent you the following intel on the playlist in progress. This is your creative compass.
+
 - **Playlist Title:** "${playlist.playlist_title}"
 - **Playlist Description:** "${playlist.playlist_description}"
-- **Songs already found and added:**
+- **Tracks Already on Deck:**
 ${foundTrackNames.length > 0 ? foundTrackNames.map(t => `- ${t}`).join('\n') : "None yet."}
-- **Songs we FAILED to find on Spotify (do not suggest these again):**
+- **Rejected Tracks (Do not suggest these):**
 ${notFoundTracks.length > 0 ? notFoundTracks.map(t => `- ${t}`).join('\n') : "None."}
 
-# Core Instructions
-1.  Analyze the playlist context to understand the vibe.
-2.  **Use your search tool to find exactly ${tracksToRequest} NEW, real song suggestions that fit this vibe.**
-3.  **DO NOT suggest any songs from the "found" or "failed" lists above.**
+# Core Directives
+1.  Absorb the essence of the playlist. Understand its title, its story, and the tracks that already define its sonic landscape.
+2.  **Dig through the digital crates. Use your search tool to unearth exactly ${tracksToRequest} new gems that will seamlessly blend with and elevate this playlist's core identity.**
+3.  A true scout never suggests a track that's already been considered. Avoid everything on the "on deck" and "rejected" lists like a scratched record.
 
-# Rules & Constraints
-- Your ENTIRE response MUST be a single, valid JSON object without any other text or markdown.
+# The Ground Rules
+- Your ENTIRE response MUST be a single, valid JSON object.
+- Do not include any text, explanations, or markdown formatting outside of the JSON structure itself.
 
-# JSON Output Structure
+# JSON Data Drop
 {"tracks":[{"song_title":"string","artist":"string"}]}
 `;
-            const api_url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+            const geminiRequestBody = {
+                contents: [{ parts: [{ text: prompt }] }],
+                tools: [{ "googleSearch": {} }]
+            };
 
             let responseText = "";
             try {
-                const response = await fetch(api_url, {
+                const response = await fetch(CLOUD_FUNCTION_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        tools: [{
-                            "googleSearch": {}
-                        }]
-                        // REMOVED: The responseMimeType setting that caused the conflict.
+                        model: 'gemini-2.5-flash-preview-05-20',
+                        body: geminiRequestBody
                     })
                 });
 
@@ -1516,7 +1496,6 @@ ${notFoundTracks.length > 0 ? notFoundTracks.map(t => `- ${t}`).join('\n') : "No
 
                 responseText = data.candidates[0].content.parts[0].text;
                 
-                // ADDED: A more robust JSON parsing logic.
                 const cleanedText = responseText.replace(/^```json\s*|```$/g, '').trim();
                 const parsedJson = JSON.parse(cleanedText);
                 return parsedJson.tracks || [];
