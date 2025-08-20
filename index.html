@@ -768,6 +768,9 @@
                 loginView.style.display = 'none';
                 mainView.style.display = 'block';
                 mainControls.style.display = 'block';
+                generateButton.disabled = false;
+                apiKeyStatus.textContent = "AI ENGINE: READY";
+                apiKeyStatus.style.color = 'var(--y2k-blue)';
             } catch (error) {
                 console.error("Error initializing UI:", error);
                 localStorage.clear();
