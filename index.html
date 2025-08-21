@@ -8,8 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        /* --- NEW: Light and Dark Theme Variables --- */
+    <style>\
         :root {
             --y2k-blue: #3a86ff;
             --y2k-green: #1ed760;
@@ -17,7 +16,6 @@
             --danger-red: #e63946;
             --danger-red-hover: #d62828;
 
-            /* Light Theme Colors */
             --bg-color: #DCE1E9;
             --shell-bg: #BFC8D9;
             --shell-highlight: #E1E8F2;
@@ -37,7 +35,6 @@
         }
 
         body.dark-mode {
-            /* Dark Theme Colors */
             --bg-color: #1a1c23;
             --shell-bg: #1c202b;
             --shell-highlight: #1b1e26;
@@ -66,29 +63,25 @@
             margin: 0;
             padding: 1rem;
             transition: color 0.3s ease;
-            position: relative; /* Needed for the ::before/::after pseudo-elements */
+            position: relative;
         }
 
-        /* --- NEW: Translucent color overlay --- */
-        /* This pseudo-element sits on top of the blurred background image */
         body::before {
             content: '';
-            position: fixed; /* Covers the entire viewport */
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: var(--bg-color); /* Uses the theme color */
-            opacity: 0.9; /* Sets the opacity to 90% */
-            z-index: -1; /* Places it behind the main content but in front of the blurred image */
-            transition: background-color 0.3s ease; /* Handles theme change transition */
+            background-color: var(--bg-color);
+            opacity: 0.9;
+            z-index: -1;
+            transition: background-color 0.3s ease;
         }
 
-        /* --- NEW: Blurred background image --- */
-        /* This pseudo-element holds the blurred background image */
         body::after {
             content: '';
-            position: fixed; /* Covers the entire viewport */
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
@@ -98,12 +91,10 @@
             background-position: center;
             background-attachment: fixed;
             filter: blur(6px);
-            /* Scale up slightly to prevent blurred edges from showing */
             transform: scale(1.025); 
-            z-index: -2; /* Places it behind everything */
+            z-index: -2;
         }
 
-        /* Hardware Shell Styling */
         #app-container {
             width: 100%;
             max-width: 40rem;
@@ -138,7 +129,6 @@
             transition: color 0.3s ease, text-shadow 0.3s ease;
         }
 
-        /* Login View */
         #login-view p {
             color: var(--text-primary);
             margin-bottom: 2rem;
@@ -173,7 +163,6 @@
                 5px 5px 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* Main View */
         #main-view {
             display: none;
         }
@@ -194,7 +183,6 @@
             margin: 0;
         }
 
-        /* --- NEW: Theme Toggle Button --- */
         #theme-toggle {
             background: var(--shell-bg);
             border: none;
@@ -417,7 +405,6 @@
             transition: color 0.3s ease;
         }
 
-        /* Results View */
         #results-view {
             margin-top: 2rem;
             display: none;
@@ -482,7 +469,6 @@
             margin-bottom: 0.5rem;
         }
 
-        /* Loading Modal */
         #loading-modal {
             display: none;
             position: fixed;
@@ -1068,8 +1054,8 @@
             .track-list { 
                 color: var(--text-secondary); 
                 opacity: 0.9; 
-                padding-left: 0; /* <-- ADJUST THIS */
-                list-style-position: inside; /* <-- ADD THIS */
+                padding-left: 0;
+                list-style-position: inside;
                 margin-top: 0; 
                 max-height: 200px; 
                 overflow-y: auto; 
