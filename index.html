@@ -58,7 +58,6 @@
 
         body {
             font-family: 'Roboto Mono', monospace;
-            background-color: var(--bg-color);
             color: var(--text-primary);
             display: flex;
             align-items: center;
@@ -66,7 +65,42 @@
             min-height: 100vh;
             margin: 0;
             padding: 1rem;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: color 0.3s ease;
+            position: relative; /* Needed for the ::before/::after pseudo-elements */
+        }
+
+        /* --- NEW: Translucent color overlay --- */
+        /* This pseudo-element sits on top of the blurred background image */
+        body::before {
+            content: '';
+            position: fixed; /* Covers the entire viewport */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-color); /* Uses the theme color */
+            opacity: 0.9; /* Sets the opacity to 90% */
+            z-index: -1; /* Places it behind the main content but in front of the blurred image */
+            transition: background-color 0.3s ease; /* Handles theme change transition */
+        }
+
+        /* --- NEW: Blurred background image --- */
+        /* This pseudo-element holds the blurred background image */
+        body::after {
+            content: '';
+            position: fixed; /* Covers the entire viewport */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('spcb.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            filter: blur(6px);
+            /* Scale up slightly to prevent blurred edges from showing */
+            transform: scale(1.025); 
+            z-index: -2; /* Places it behind everything */
         }
 
         /* Hardware Shell Styling */
@@ -632,7 +666,6 @@
         const REDIRECT_URI = window.location.origin + window.location.pathname;
 
         let playlistGenerationState = { isCancelled: false };
-        // NEW: Global array to hold playlist proposals before user confirmation
         let playlistProposals = [];
 
         const loginView = document.getElementById('login-view');
@@ -653,7 +686,6 @@
         const cancelButton = document.getElementById('cancel-button');
         const themeToggleButton = document.getElementById('theme-toggle');
 
-        // --- Theme Toggle Logic ---
         themeToggleButton.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             let currentTheme = 'light';
@@ -835,10 +867,9 @@
             console.log("Cancellation requested by user.");
         });
 
-        // MODIFIED: This function now handles PHASE 1 (Generation & Proposal)
         generateButton.addEventListener('click', async () => {
             playlistGenerationState.isCancelled = false;
-            playlistProposals = []; // Clear previous proposals
+            playlistProposals = [];
             resultsView.style.display = 'none';
             playlistLinks.innerHTML = '';
             showLoadingModal("Processing your input...");
@@ -847,7 +878,6 @@
             const playlistLength = parseInt(playlistLengthInput.value, 10);
             const numPlaylists = parseInt(numPlaylistsInput.value, 10);
 
-            // Input validation remains the same
             if (isNaN(playlistLength) || playlistLength < 3 || playlistLength > 150) {
                 alert("Please set 'Tracks per Mix' between 3 and 150.");
                 hideLoadingModal();
@@ -894,7 +924,7 @@
                 updateProgress(20, "AI ideas received. Preparing to create playlists...");
                 const totalPlaylists = playlistsToCreate.length;
                 const loopProgressStart = 20;
-                const loopProgressWeight = 80; // Increased weight as this is the main work now
+                const loopProgressWeight = 80;
 
                 for (const [index, playlist] of playlistsToCreate.entries()) {
                     if (playlistGenerationState.isCancelled) throw new CancellationError("Cancelled during playlist creation loop.");
@@ -902,12 +932,10 @@
                     const playlistBaseProgress = loopProgressStart + (index / totalPlaylists) * loopProgressWeight;
                     const weightForThisPlaylist = loopProgressWeight / totalPlaylists;
 
-                    // This function finds all the song URIs, which is what we need
                     const finalTrackUrisMap = await fillPlaylistToLength(playlist, playlistLength, accessToken, index, totalPlaylists, playlistBaseProgress, weightForThisPlaylist);
 
                     if (playlistGenerationState.isCancelled) throw new CancellationError("Cancelled during track finding.");
                     
-                    // Instead of creating the playlist, we store the proposal
                     if (finalTrackUrisMap.size > 0) {
                         playlistProposals.push({
                             geminiData: playlist,
@@ -924,7 +952,6 @@
 
                 updateProgress(100, "All proposals generated!");
                 
-                // NEW: Display the confirmation view instead of final results
                 displayConfirmationView(playlistProposals);
 
             } catch (error) {
@@ -937,11 +964,10 @@
                     alert(`An error occurred: ${error.message}`);
                 }
             } finally {
-                setTimeout(hideLoadingModal, 500); // Shorter delay
+                setTimeout(hideLoadingModal, 500);
             }
         });
         
-        // NEW: Event listener for the confirmation buttons (handles PHASE 2)
         playlistLinks.addEventListener('click', async (event) => {
             const createButton = event.target.closest('.confirm-create-button');
             if (createButton) {
@@ -950,7 +976,6 @@
             }
         });
 
-        // NEW: The core logic for creating a single playlist on Spotify
         async function handlePlaylistCreation(index, button) {
             button.disabled = true;
             button.textContent = 'Creating...';
@@ -966,15 +991,12 @@
                 const accessToken = await getValidAccessToken();
                 const user = await fetchWebApi('v1/me', 'GET', accessToken);
 
-                // 1. Create the playlist
                 button.textContent = 'Creating playlist...';
                 const newPlaylist = await createSpotifyPlaylist(user.id, proposal.geminiData.playlist_title, proposal.geminiData.playlist_description, accessToken);
 
-                // 2. Add tracks
                 button.textContent = 'Adding tracks...';
                 await addTracksToPlaylist(newPlaylist.id, proposal.trackUris, accessToken);
                 
-                // 3. Generate and upload cover art
                 button.textContent = 'Generating cover art...';
                 const coverImage = await generatePlaylistCoverImage(
                     proposal.geminiData.playlist_title,
@@ -984,7 +1006,6 @@
                 button.textContent = 'Uploading cover...';
                 await uploadPlaylistCover(newPlaylist.id, coverImage, accessToken);
 
-                // 4. Success! Replace the card with the final link
                 const finalPlaylistData = {
                     name: newPlaylist.name,
                     description: proposal.geminiData.playlist_description,
@@ -1010,7 +1031,6 @@
             }
         }
         
-        // NEW: Function to display the playlist proposals for user confirmation
         function displayConfirmationView(proposals) {
             if (proposals.length === 0 && !playlistGenerationState.isCancelled) {
                 playlistLinks.innerHTML = `<p style="text-align:center;">Could not generate any valid proposals. Try a different input.</p>`;
@@ -1034,8 +1054,6 @@
             resultsView.style.display = 'block';
         }
 
-        // NEW: Add some basic styling for the new confirmation view.
-        // You can add this inside your <style> tag in the <head>.
         const proposalStyles = `
             .playlist-proposal {
                 background-color: var(--translucent-dark-bg);
@@ -1131,7 +1149,6 @@ This is the feeling you need to capture in a single, powerful image. Let the tit
 
             const data = await response.json();
 
-            // Extract first image from inlineData
             let base64Image = null;
             for (const part of data.candidates?.[0]?.content?.parts || []) {
                 if (part.inlineData?.mimeType?.startsWith("image/")) {
@@ -1145,13 +1162,11 @@ This is the feeling you need to capture in a single, powerful image. Let the tit
         }
 
         async function uploadPlaylistCover(playlistId, base64Image) {
-            // Always get fresh token to avoid CORS from stale access
             const accessToken = await getValidAccessToken();
             if (!accessToken) throw new Error("No valid Spotify access token available");
 
             console.log("🎵 Uploading cover for playlist:", playlistId);
 
-            // Load image into canvas
             const img = await fetch(base64Image).then(r => r.blob());
             const bitmap = await createImageBitmap(img);
 
@@ -1179,7 +1194,6 @@ This is the feeling you need to capture in a single, powerful image. Let the tit
 
                 if (blobSize <= MAX_BYTES) break;
 
-                // Reduce resolution first, then quality
                 if (targetSize > 256) {
                     targetSize = Math.floor(targetSize * 0.85);
                 } else {
@@ -1192,7 +1206,6 @@ This is the feeling you need to capture in a single, powerful image. Let the tit
                 }
             }
 
-            // Upload to Spotify
             const res = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
                 method: 'PUT',
                 headers: {
@@ -1294,7 +1307,7 @@ This is the feeling you need to capture in a single, powerful image. Let the tit
                 console.log(`Successfully filled playlist "${playlist.playlist_title}" with ${finalUris.size} songs.`);
             }
 
-            return finalUris; // MODIFIED: Return the whole Map
+            return finalUris;
         }
 
         async function callGeminiWithRetries(userInput, numPlaylists, songsPerPlaylist, maxRetries = 3) {
